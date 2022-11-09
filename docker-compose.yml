@@ -1,0 +1,134 @@
+version: "3"
+services:
+  mongodb:
+    hostname: mongodb
+    image: mongo:5.0-focal
+    restart: always
+    container_name: "mongodb"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD:
+    volumes:
+      - $TEMP\mongoDB\data:/data/db
+      - $TEMP\mongoDB\etc\mongod.conf:/etc/mongod.conf
+      - $TEMP\mongoDB\configdb:/data/configdb
+    ports:
+      - "27017:27017"
+    command: [--auth]
+
+  mysql:
+    hostname: mysql
+    image: mysql:5.7
+    restart: always
+    container_name: mysql
+    ports:
+      - "33060:3306"
+    environment:
+#      - MYSQL_ROOT_PASSWORD=
+      - TZ="Asia/Seoul"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - $TEMP\mysql\data:/var/lib/mysql
+      - $TEMP\mysql\conf:/etc/mysql
+
+  postgresql:
+    hostname: postgresql
+    image: postgres:14-alpine
+    container_name: postgresql
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - $TEMP\postgresql\data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=root
+#      - POSTGRES_PASSWORD=
+      - TZ="Asia/Seoul"
+
+  oracle:
+    hostname: oracle
+    image: store/oracle/database-enterprise:12.2.0.1-slim
+    container_name: oracle
+    restart: always
+    ports:
+      - "1521:1521"
+    volumes:
+      - $TEMP\oracle\u01:/u01
+      - $TEMP\oracle\u02:/u02
+      - $TEMP\oracle\u03:/u03
+      - $TEMP\oracle\u04:/u04
+      - $TEMP\oracle\oradata:/opt/oracle/oradata
+    environment:
+      - TZ="Asia/Seoul"
+      - NLS_LANG=KOREAN_KOREA.KO16MSWIN949
+      - LC_ALL=ko_KR.UTF-8
+#      - ORACLE_PWD=
+      - ORACLE_CHARACTERSET=KO16MSWIN949
+
+  mariadb:
+    hostname: mariadb
+    image: mariadb:10.6-focal
+    restart: always
+    container_name: mariadb
+    ports:
+      - "33006:3306"
+    environment:
+#      MYSQL_ROOT_PASSWORD:
+      TZ: "Asia/Seoul"
+      MYSQL_DATABASE: zeromon
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - $TEMP\mariadb\data:/var/lib/mysql
+      - $TEMP\mariadb\conf:/etc/mysql
+
+  redis:
+    hostname: redis
+    image: redis:7-alpine
+    restart: always
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+       - $TEMP\redis:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:3.8-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - $TEMP\rabbitmq\data:/data
+      - $TEMP\rabbitmq\lib:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+#      RABBITMQ_DEFAULT_PASS:
+
+  zookeeper:
+    container_name: zookeeper
+
+    image: zookeeper:3.7.0
+    ports:
+      - "2181:2181"
+    environment:
+      JVMFLAGS: "-Xmx1024m"
+    volumes:
+      - D:\project\zookeeper\data:/data
+      - D:\project\zookeeper\datalog:/datalog
+      - D:\project\zookeeper\logs:/logs
+
+  zk-web:
+    container_name: local-zk-web
+    image: goodguide/zk-web
+    ports:
+      - "8094:8080"
+    environment:
+      - ZKWEB_PORT=8080
+#      - ZKWEB_CREDENTIALS=
